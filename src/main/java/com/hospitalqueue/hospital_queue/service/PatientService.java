@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import com.hospitalqueue.hospital_queue.domain.Patient;
 import com.hospitalqueue.hospital_queue.repository.PatientRepository;
 import com.hospitalqueue.hospital_queue.web.CreatePatientRequest;
+import com.hospitalqueue.hospital_queue.exception.NotFoundException;
 
 @Service
 public class PatientService {
@@ -25,6 +26,11 @@ public class PatientService {
 
     public List<Patient> findAll() {
         return patientRepository.findAll();
+    }
+
+        public Patient get(Long id) {
+        return patientRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Patient " + id + " not found"));
     }
 
     
