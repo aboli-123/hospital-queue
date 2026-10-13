@@ -14,13 +14,15 @@ public record AppointmentResponse(
         String patientName,
         LocalDateTime slotTime,
         AppointmentStatus status,
-        Priority priority) {
+        Priority priority,
+        LocalDateTime arrivedAt) {
 
     public static AppointmentResponse from(Appointment a) {
         return new AppointmentResponse(
                 a.getId(),
                 a.getDoctor().getId(), a.getDoctor().getName(),
                 a.getPatient().getId(), a.getPatient().getName(),
-                a.getSlotTime(), a.getStatus(), a.getPriority());
+                a.getSlotTime(), a.getStatus(), a.getPriority(),
+                a.getArrivedAt());
     }
 }
