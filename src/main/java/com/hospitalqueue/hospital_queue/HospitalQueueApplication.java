@@ -8,6 +8,7 @@ public class HospitalQueueApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(HospitalQueueApplication.class, args);
+		
 	}
 
 }

@@ -18,7 +18,12 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(SlotUnavailableException.class)
-    public ProblemDetail conflict(SlotUnavailableException e) {
+    public ProblemDetail slotUnavailable(SlotUnavailableException e) {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, e.getMessage());
+    }
+
+    @ExceptionHandler(InvalidStateException.class)
+    public ProblemDetail invalidState(InvalidStateException e) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, e.getMessage());
     }
 

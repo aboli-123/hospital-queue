@@ -8,9 +8,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.hospitalqueue.hospital_queue.domain.Appointment;
+import com.hospitalqueue.hospital_queue.domain.AppointmentStatus;
 import com.hospitalqueue.hospital_queue.domain.Doctor;
 import com.hospitalqueue.hospital_queue.domain.Patient;
 import com.hospitalqueue.hospital_queue.domain.Priority;
+import com.hospitalqueue.hospital_queue.exception.InvalidStateException;
+import com.hospitalqueue.hospital_queue.exception.NotFoundException;
 import com.hospitalqueue.hospital_queue.exception.SlotUnavailableException;
 import com.hospitalqueue.hospital_queue.repository.AppointmentRepository;
 import com.hospitalqueue.hospital_queue.web.BookingRequest;
@@ -47,6 +50,24 @@ public class AppointmentService {
         } catch (DataIntegrityViolationException e) {
             throw new SlotUnavailableException("Slot " + slot + " was just taken by someone else");
         }
+    }
+
+    @Transactional
+    public Appointment markArrived(Long id) {
+        Appointment a = get(id);
+
+        if (a.getStatus() != AppointmentStatus.BOOKED) {
+            throw new InvalidStateException("Cannot mark arrived: appointment is " + a.getStatus());
+        }
+        a.setStatus(AppointmentStatus.WAITING);
+        a.setArrivedAt(LocalDateTime.now());
+        return a;
+    }
+
+    @Transactional(readOnly = true)
+    public Appointment get(Long id) {
+        return appointmentRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Appointment " + id + " not found"));
     }
 
     private void validateSlot(Doctor doctor, LocalDateTime slot) {
