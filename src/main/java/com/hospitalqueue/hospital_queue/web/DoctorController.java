@@ -3,6 +3,7 @@ package com.hospitalqueue.hospital_queue.web;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,6 +30,7 @@ public class DoctorController {
         this.queueService = queueService;
     }
 
+    
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Doctor create(@Valid @RequestBody CreateDoctorRequest req) {
@@ -45,5 +47,11 @@ public class DoctorController {
         return queueService.queueFor(id).stream()
                 .map(AppointmentResponse::from)
                 .toList();
+    }
+        @PostMapping("/{id}/call-next")
+    public ResponseEntity<AppointmentResponse> callNext(@PathVariable Long id) {
+        return queueService.callNext(id)
+                .map(a -> ResponseEntity.ok(AppointmentResponse.from(a)))
+                .orElseGet(() -> ResponseEntity.noContent().build());
     }
 }

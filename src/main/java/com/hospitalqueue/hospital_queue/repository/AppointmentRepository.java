@@ -3,6 +3,7 @@ package com.hospitalqueue.hospital_queue.repository;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -19,4 +20,6 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
 
     // All appointments of a doctor whose status is any one of the given statuses
     List<Appointment> findByDoctorIdAndStatusIn(Long doctorId, Collection<AppointmentStatus> statuses);
+
+        Optional<Appointment> findFirstByDoctorIdAndStatus(Long doctorId, AppointmentStatus status);
 }

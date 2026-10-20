@@ -15,7 +15,9 @@ public record AppointmentResponse(
         LocalDateTime slotTime,
         AppointmentStatus status,
         Priority priority,
-        LocalDateTime arrivedAt) {
+        LocalDateTime arrivedAt,
+        LocalDateTime startedAt,
+        LocalDateTime finishedAt) {
 
     public static AppointmentResponse from(Appointment a) {
         return new AppointmentResponse(
@@ -23,6 +25,6 @@ public record AppointmentResponse(
                 a.getDoctor().getId(), a.getDoctor().getName(),
                 a.getPatient().getId(), a.getPatient().getName(),
                 a.getSlotTime(), a.getStatus(), a.getPriority(),
-                a.getArrivedAt());
+                a.getArrivedAt(), a.getStartedAt(), a.getFinishedAt());
     }
 }
