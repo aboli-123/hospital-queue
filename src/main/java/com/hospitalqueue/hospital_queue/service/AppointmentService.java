@@ -35,13 +35,14 @@ public class AppointmentService {
 
     @Transactional
     public Appointment book(BookingRequest req) {
+
         Doctor doctor = doctorService.get(req.doctorId());
         Patient patient = patientService.get(req.patientId());
         LocalDateTime slot = req.slotTime();
 
         validateSlot(doctor, slot);
 
-        if (appointmentRepository.existsByDoctorIdAndSlotTime(doctor.getId(), slot)) {
+        if (appointmentRepository.existsByDoctorIdAndActiveSlot(doctor.getId(), slot)) {
             throw new SlotUnavailableException("Slot " + slot + " is already booked");
         }
         try {
@@ -61,6 +62,17 @@ public class AppointmentService {
         }
         a.setStatus(AppointmentStatus.WAITING);
         a.setArrivedAt(LocalDateTime.now());
+        return a;
+    }
+
+    @Transactional
+    public Appointment cancel(Long id) {
+        Appointment a = get(id);
+
+        if (a.getStatus() != AppointmentStatus.BOOKED && a.getStatus() != AppointmentStatus.WAITING) {
+            throw new InvalidStateException("Cannot cancel: appointment is " + a.getStatus());
+        }
+        a.cancel();
         return a;
     }
 

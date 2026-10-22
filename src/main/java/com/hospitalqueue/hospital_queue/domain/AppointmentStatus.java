@@ -7,7 +7,8 @@ public enum AppointmentStatus {
     WAITING,      // patient arrived, in the queue
     IN_PROGRESS,  // doctor is seeing the patient
     COMPLETED,
-    NO_SHOW
+    NO_SHOW,
+    CANCELLED
 
  
 }

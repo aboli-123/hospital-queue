@@ -5,7 +5,8 @@ import java.time.LocalDateTime;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "appointments", uniqueConstraints = @UniqueConstraint(columnNames = { "doctor_id", "slot_time" }))
+@Table(name = "appointments", uniqueConstraints = @UniqueConstraint(
+        name = "uk_doctor_active_slot", columnNames = { "doctor_id", "active_slot" }))
 public class Appointment {
 
     @Id
@@ -22,6 +23,11 @@ public class Appointment {
 
     @Column(name = "slot_time")
     private LocalDateTime slotTime;
+
+    // Copy of slotTime while the appointment holds the slot; null after cancelling.
+    // The unique rule uses this column, so a cancelled slot can be booked again.
+    @Column(name = "active_slot")
+    private LocalDateTime activeSlot;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -49,10 +55,17 @@ public class Appointment {
         this.doctor = doctor;
         this.patient = patient;
         this.slotTime = slotTime;
+        this.activeSlot = slotTime;
         this.priority = priority;
     }
 
-    // Getters (all fields)
+    // Cancelling frees the slot and keeps the row for history
+    public void cancel() {
+        this.status = AppointmentStatus.CANCELLED;
+        this.activeSlot = null;
+    }
+
+    // Getters
     public Long getId() {
         return id;
     }
@@ -67,6 +80,10 @@ public class Appointment {
 
     public LocalDateTime getSlotTime() {
         return slotTime;
+    }
+
+    public LocalDateTime getActiveSlot() {
+        return activeSlot;
     }
 
     public AppointmentStatus getStatus() {

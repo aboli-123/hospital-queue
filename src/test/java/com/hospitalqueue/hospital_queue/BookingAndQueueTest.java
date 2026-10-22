@@ -209,4 +209,38 @@ class BookingAndQueueTest {
         assertNull(s.patientsAhead());
         assertNull(s.estimatedWaitMinutes());
     }
+        // ---------- Cancel ----------
+
+    @Test
+    void cancelledSlotCanBeBookedAgain() {
+        Appointment a = book(ravi, at(10, 0));
+        appointmentService.cancel(a.getId());
+        assertEquals(AppointmentStatus.CANCELLED, a.getStatus());
+
+        Appointment b = book(anita, at(10, 0));   // same slot, now free
+        assertEquals(AppointmentStatus.BOOKED, b.getStatus());
+    }
+
+    @Test
+    void cancelledPatientIsNotInTheQueue() {
+        Appointment a = book(ravi, at(10, 0));
+        Appointment b = book(anita, at(10, 15));
+        appointmentService.cancel(a.getId());
+
+        List<Long> order = queueService.queueFor(doctor.getId()).stream()
+                .map(Appointment::getId).toList();
+        assertEquals(List.of(b.getId()), order);
+    }
+
+    @Test
+    void cannotCancelTwiceOrAfterTheVisitStarted() {
+        Appointment a = book(ravi, at(10, 0));
+        appointmentService.cancel(a.getId());
+        assertThrows(InvalidStateException.class, () -> appointmentService.cancel(a.getId()));
+
+        Appointment b = book(anita, at(10, 15));
+        appointmentService.markArrived(b.getId());
+        queueService.callNext(doctor.getId());   // Anita is IN_PROGRESS now
+        assertThrows(InvalidStateException.class, () -> appointmentService.cancel(b.getId()));
+    }
 }

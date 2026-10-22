@@ -13,7 +13,8 @@ import com.hospitalqueue.hospital_queue.domain.AppointmentStatus;
 
 public interface AppointmentRepository extends JpaRepository<Appointment, Long> {
 
-    boolean existsByDoctorIdAndSlotTime(Long doctorId, LocalDateTime slotTime);
+    // Is this slot held by an active appointment? (cancelled ones don't count)
+    boolean existsByDoctorIdAndActiveSlot(Long doctorId, LocalDateTime activeSlot);
 
     List<Appointment> findByDoctorIdAndStatus(Long doctorId, AppointmentStatus status);
 

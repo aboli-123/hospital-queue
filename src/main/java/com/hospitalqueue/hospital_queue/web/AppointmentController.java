@@ -42,6 +42,11 @@ public class AppointmentController {
         return AppointmentResponse.from(appointmentService.markArrived(id));
     }
 
+        @PostMapping("/{id}/cancel")
+    public AppointmentResponse cancel(@PathVariable Long id) {
+        return AppointmentResponse.from(appointmentService.cancel(id));
+    }
+
     @GetMapping("/{id}/queue-status")
     public QueueStatusResponse queueStatus(@PathVariable Long id) {
         return queueService.statusOf(id);
